@@ -21,27 +21,6 @@ public class MainActivity extends AppCompatActivity {
     // Archive of stations:
     // https://transliacija.rc.lt/rc128.mp3
 
-    static boolean playing = false;
-    static String currentStation = "";
-
-
-    public void setPlaying(){
-        playing = true;
-    }
-
-    public void setStopped(){
-        playing = false;
-    }
-
-    public void setCurrentStation(String url) {
-        currentStation = url;
-    }
-    // ToDo Add Polymorphysm here????
-    public void setCurrentStationEmpty() {
-        currentStation = "";
-    }
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,8 +44,7 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ActionBar.LayoutParams.MATCH_PARENT,
                 ActionBar.LayoutParams.WRAP_CONTENT);
 
-
-        for(Station stn : stations) {
+        for (Station stn : stations) {
             LinearLayout ll = new LinearLayout(this);
             ll.setOrientation(LinearLayout.VERTICAL);
 
@@ -79,14 +57,13 @@ public class MainActivity extends AppCompatActivity {
             btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
-                    if(!playing) {
+                    if (!Station.playing) {
 
                         try {
-                            System.out.println("Edgaras Starting");
                             player.setDataSource(stn.getUrl());
                             player.prepareAsync();
-                            setPlaying();
-                            setCurrentStation(stn.getUrl());
+                            Station.setPlaying();
+                            Station.setCurrentStation(stn.getUrl());
                             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                 @Override
@@ -98,26 +75,26 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     } else {
-                        System.out.println("Edgaras Stopping");
                         // If it's same as current station then just stop
-                        if (currentStation.equals(stn.getUrl())) {
+                        if (Station.currentStation.equals(stn.getUrl())) {
                             player.stop();
                             player.reset();
-                            setStopped();
-                            setCurrentStationEmpty();
+                            Station.setStopped();
+                            Station.setCurrentStation();
                         }
                         // If it's different as current station then stop and play new one
                         else {
-                            player.stop();
-                            player.reset();
-                            setCurrentStation(stn.getUrl());
                             try {
+                                player.stop();
+                                player.reset();
+                                Station.setCurrentStation(stn.getUrl());
                                 player.setDataSource(stn.getUrl());
+                                player.prepareAsync();
+                                player.start();
                             } catch (IOException e) {
-                                throw new RuntimeException(e);
+                                e.printStackTrace();
+                                ;
                             }
-                            player.prepareAsync();
-                            player.start();
                         }
                     }
                 }
@@ -131,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop(){
         super.onStop();
-        System.out.println("Edgaras releasing");
         //player.release();
     }
 }
