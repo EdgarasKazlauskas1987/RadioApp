@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
     // https://transliacija.rc.lt/rc128.mp3
 
     static boolean playing = false;
+    static String currentStation = "";
+
 
     public void setPlaying(){
         playing = true;
@@ -31,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
         playing = false;
     }
 
+    public void setCurrentStation(String url) {
+        currentStation = url;
+    }
+    // ToDo Add Polymorphysm here????
+    public void setCurrentStationEmpty() {
+        currentStation = "";
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         final float scale = getApplicationContext().getResources().getDisplayMetrics().density;
-
 
         Station radiocentras = new Station("Radiocentras", "https://stream2.rc.lt/rc128.mp3");
         Station m1 = new Station("M-1", "https://radio.m-1.fm/m1/mp3");
@@ -77,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
                             player.setDataSource(stn.getUrl());
                             player.prepareAsync();
                             setPlaying();
+                            setCurrentStation(stn.getUrl());
                             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
                                 @Override
@@ -89,9 +99,26 @@ public class MainActivity extends AppCompatActivity {
                         }
                     } else {
                         System.out.println("Edgaras Stopping");
-                        player.stop();
-                        player.reset();
-                        setStopped();
+                        // If it's same as current station then just stop
+                        if (currentStation.equals(stn.getUrl())) {
+                            player.stop();
+                            player.reset();
+                            setStopped();
+                            setCurrentStationEmpty();
+                        }
+                        // If it's different as current station then stop and play new one
+                        else {
+                            player.stop();
+                            player.reset();
+                            setCurrentStation(stn.getUrl());
+                            try {
+                                player.setDataSource(stn.getUrl());
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            player.prepareAsync();
+                            player.start();
+                        }
                     }
                 }
             });
