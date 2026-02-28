@@ -1,14 +1,15 @@
 plugins {
-    id 'com.android.application'
+   id "com.android.application"
 }
 
 android {
-    compileSdk 32
+    namespace "com.example.radio_app"
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.example.radio_app"
         minSdk 21
-        targetSdk 32
+        targetSdk 36
         versionCode 1
         versionName "1.0"
 
@@ -25,6 +26,8 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    //compileSdkMinor 1
+    //buildToolsVersion '36.1.0'
 }
 
 dependencies {
